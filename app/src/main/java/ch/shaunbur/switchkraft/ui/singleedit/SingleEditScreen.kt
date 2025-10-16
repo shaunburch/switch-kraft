@@ -11,10 +11,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import ch.shaunbur.switchkraft.EditController
 import ch.shaunbur.switchkraft.EditMode
 import ch.shaunbur.switchkraft.EditScope
-import ch.shaunbur.switchkraft.Field
+import ch.shaunbur.switchkraft.EditableTextField
+import ch.shaunbur.switchkraft.LocalEditController
 import ch.shaunbur.switchkraft.ScreenDefinition
+import ch.shaunbur.switchkraft.useEditController
 
 object SingleEditScreen : ScreenDefinition {
     override val route: String = "single"
@@ -31,20 +34,22 @@ object SingleEditScreen : ScreenDefinition {
 fun SingleEditScreen(
     onBack: () -> Unit = {}
 ) {
-    var editMode by remember { mutableStateOf(EditMode.View) }
+    val editController = LocalEditController.current
     Column {
         Button(
             onClick = {
-                editMode = if (editMode == EditMode.View) EditMode.Edit else EditMode.View
+                editController.beginEdit()
             }
         ) {
             Text(if (editMode == EditMode.Edit) "Save" else "Edit")
         }
         var value by remember { mutableStateOf("Text") }
-        EditScope(mode = editMode) {
-            Field(
+        EditScope {
+            EditableTextField(
+                label = "Editable Field",
                 value = value,
                 onValueChange = { value = it },
+                validator = { it.isNotEmpty() }
             )
         }
     }
